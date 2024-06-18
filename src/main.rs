@@ -16,11 +16,11 @@ fn main() {
     part_vec.push(num * num - num);
     num += 1;
   }
-  //num = start
+  //num is start
   //part_vec.get(x).is_ok() | x < start
 
   while num < end {//from start to end
-    part_vec.push(num * num - num);
+    part_vec.push(num * num - num);//add current number pair
     
     let mut c = 0;
     //check if All x < num | x is prime
@@ -29,6 +29,7 @@ fn main() {
     }
     
     if c < num as usize{//num is no caboose number
+      num += 1;
       continue;
     }
     
