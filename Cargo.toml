@@ -1,0 +1,7 @@
+[package]
+name = "caboose_numbers"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+primes = "0.4.0"
