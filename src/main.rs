@@ -1,13 +1,13 @@
 use std::env::args;
 use primes;
+use rayon::prelude::*;
 //use pbr::{self, MultiBar}; //ty https://github.com/a8m/pb/tree/master
 
-fn main() {
+fn main(){
 
   let args: Vec<String> = args().collect();
 
-  let start = u64::from_str_radix(args.get(1).unwrap(), 10).unwrap();
-  let end = u64::from_str_radix(args.get(2).unwrap(), 10).unwrap();
+  let end = usize::from_str_radix(&args[1], 10).unwrap_or(100);
 
   //let mb = MultiBar::new();
   //mb.println(&format!("Caboose from {} to {}", start,end));
@@ -15,42 +15,34 @@ fn main() {
   //let mut b1 = mb.create_bar(start);
   //let mut b2 = mb.create_bar(end-start);
 
-  let mut part_vec: Vec<u64> = Vec::new();
+  let mut part_vec = vec![0usize; end];//create buffer for threads to write
 
-  let mut num: u64 = 0;
+  eprintln!("Running on {:?} threads", rayon::current_num_threads());
 
-  while num < start{
-    //b1.inc();
-    part_vec.push(num * num - num);
-    num += 1;
-  }
-  //b1.finish_print("Done");
-  //num is start
-  //part_vec.get(x).is_ok() | x < start
 
-  while num < end {//from start to end
-    
-    //b2.inc();
+  //fill test buffer
+  part_vec.par_iter_mut().enumerate().for_each(|(idx, x)| {
+    *x = idx * idx - idx;
+  });
 
-    part_vec.push(num * num - num);//add current number pair
+
+  //check if number is caboose number
+  part_vec.par_iter().enumerate().for_each(|(idx, _)| {
     
     let mut c = 0;
-    //check if All x < num | x is prime
-    while primes::is_prime(num + part_vec.get(c).unwrap()) {
+
+    while c <= idx {
+
+      if !primes::is_prime((idx + part_vec[c]) as u64){
+        if c == idx{
+          println!("{} is a caboose number", idx);
+        }
+        break;
+      }
+
       c += 1;
     }
     
-    if c < num as usize{//num is no caboose number
-      num += 1;
-      continue;
-    }
-    
-    println!("{} is a Caboose number", num);
+  });
 
-    num += 1;
-  }
-  //b2.finish();
-
-  //mb.listen();
-  todo!("add multithreading");
 }
